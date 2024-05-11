@@ -5,7 +5,7 @@ import MDXCounter from "./MDXCounter";
 export const MDXComponent = ({ code }: { code: string }) => {
   const Component = useMemo(() => getMDXComponent(code), [code]);
 
-  return <MDXComponentBase Component={Component}></MDXComponentBase>;
+  return <MDXComponentBase Component={Component} />;
 };
 
 export const MDXComponentBase = ({

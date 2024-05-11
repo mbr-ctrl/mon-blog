@@ -4,9 +4,8 @@ import matter from "gray-matter";
 import { Post, PostMeta } from "./types";
 import { bundleMDX } from "mdx-bundler";
 
-const postDirectory = path.join(process.cwd(), "posts");
-
-export const getSortedPostsData = (): PostMeta[] => {
+export const getSortedPostsData = (directory: string): PostMeta[] => {
+  const postDirectory = path.join(process.cwd(), `posts/${directory}`);
   const fileNames = fs
     .readdirSync(postDirectory)
     .filter((f) => f.includes(".mdx"));
@@ -32,9 +31,9 @@ export type PostSlugParams = {
   };
 };
 
-export const getPostsSlug = (): PostSlugParams[] => {
+export const getPostsSlug = (directory: string): PostSlugParams[] => {
   // Fetch all post data
-  const allPostsData = getSortedPostsData();
+  const allPostsData = getSortedPostsData(directory);
   // Create paths based on post IDs
   const paths = allPostsData.map((post) => ({
     params: { slug: post.id }, // Ensure the key is 'slug' (not 'slud')
@@ -43,7 +42,11 @@ export const getPostsSlug = (): PostSlugParams[] => {
   return paths;
 };
 
-export const getPostBySlug = async (slug: string): Promise<Post> => {
+export const getPostBySlug = async (
+  slug: string,
+  directory: string
+): Promise<Post> => {
+  const postDirectory = path.join(process.cwd(), `posts/${directory}`);
   const fullPath = path.join(postDirectory, `${slug}.mdx`);
   const fileContents = fs.readFileSync(fullPath, "utf8");
 
