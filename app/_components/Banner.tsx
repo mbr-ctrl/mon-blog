@@ -7,7 +7,8 @@ export default function Banner() {
         <span className="text-9xl font-bold">&lsaquo;MmB/&rsaquo;</span>{" "}
       </h2>
       <p className="text-3xl">
-        Le blog de contenu pour les devs francophones !
+        Une source d'inspiration et de connaissances pour les devs francophones
+        !
       </p>
       <hr className="w-5/6 h-1" />
     </section>

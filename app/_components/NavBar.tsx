@@ -23,31 +23,31 @@ import Hamburger from "hamburger-react";
 const components: { title: string; href: string; description: string }[] = [
   {
     title: "Django ",
-    href: "/docs/primitives/alert-dialog",
+    href: "#",
     description:
       "Créez des sites web dynamiques et évolutifs avec des fonctionnalités comme l'authentification des utilisateurs, la gestion de contenu, etc.",
   },
   {
     title: "Dash",
-    href: "/docs/primitives/hover-card",
+    href: "#",
     description:
       "Apprenez à déployer vos applications Dash sur le web pour que d'autres puissent les utiliser.",
   },
   {
     title: "Flask",
-    href: "/docs/primitives/progress",
+    href: "#",
     description:
       "Créez des applications web légères et flexibles avec Flask, un microframework Python",
   },
   {
     title: "Excel",
-    href: "/docs/primitives/scroll-area",
+    href: "#",
     description:
       "Apprenez à organiser, analyser et visualiser des données avec Excel.",
   },
   {
     title: "Machine Learning",
-    href: "/docs/primitives/tabs",
+    href: "#",
     description:
       "Développez les compétences nécessaires pour construire des modèles de Machine Learning capables de faire des prédictions, résoudre des problèmes et automatiser des tâches.",
   },
@@ -86,7 +86,7 @@ export default function NavBar() {
                         <NavigationMenuLink asChild className="mt-0">
                           <a
                             className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                            href="/"
+                            href="/posts/python"
                           >
                             <div className="mb-2 mt-4 text-lg font-medium">
                               <FaPython className="text-5xl" />
@@ -99,14 +99,14 @@ export default function NavBar() {
                           </a>
                         </NavigationMenuLink>
                       </li>
-                      <ListItem href="#" title="React js">
+                      <ListItem href="/posts/react" title="React js">
                         React et NextJs, composants réutilisables
                       </ListItem>
-                      <ListItem href="#" title="Flutter">
+                      <ListItem href="/posts/flutter" title="Flutter">
                         Développer des applications mobiles fluides et
                         performantes
                       </ListItem>
-                      <ListItem href="#" title="TailwindCSS">
+                      <ListItem href="/posts/tailwindcss" title="TailwindCSS">
                         Tous nos articles sur les UI avec TailwindCSS
                       </ListItem>
                     </ul>
@@ -141,7 +141,7 @@ export default function NavBar() {
             </NavigationMenu>
             <div className="flex justify-between items-center">
               <div className="flex justify-end gap-4 mr-4">
-                <a href="#">
+                <a href="https://twitter.com/moubarakmohame4">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -163,7 +163,7 @@ export default function NavBar() {
                     <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"></path>
                   </svg>
                 </a>
-                <a href="#">
+                <a href="https://web.facebook.com/profile.php?id=100093378948984">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"

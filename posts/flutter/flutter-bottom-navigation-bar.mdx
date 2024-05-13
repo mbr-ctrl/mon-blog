@@ -1,0 +1,136 @@
+---
+title: "Créer une Bottom Navigation Bar sur Flutter"
+description: "Créez une barre de navigation inférieure flottante à l'aide du widget BottomNavigationBar Flutter qui fonctionne avec plus de 3 éléments !"
+author: "Mubarak Mohamed"
+date: 2024-02-02
+tags: ["flutter", "Navigation"]
+thumbnail: "firebase.png"
+---
+
+## Le Code
+
+```dart:main.dart
+import 'package:flutter/material.dart';
+import 'package:bottom_navigation_bar/nav.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Bottom Navigation Bar Tutorial',
+      home: Nav(),
+    );
+  }
+}
+```
+
+```dart:nav.dart
+import 'package:flutter/material.dart';
+import 'package:bottom_navigation_bar/home_screen.dart';
+
+class Nav extends StatefulWidget {
+  @override
+  _NavState createState() => _NavState();
+}
+
+class _NavState extends State<Nav> {
+  int _selectedIndex = 0;
+  List<Widget> _widgetOptions = <Widget>[
+    Home(),
+    Text('Messgaes Screen'),
+    Text('Profile Screen'),
+  ];
+
+  void _onItemTap(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Bottom Navigation Bar Tutorial'),
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.home,
+            ),
+            title: Text(
+              'Home',
+            ),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.message,
+            ),
+            title: Text(
+              'Messages',
+            ),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person,
+            ),
+            title: Text(
+              'Profile',
+            ),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTap,
+        selectedFontSize: 13.0,
+        unselectedFontSize: 13.0,
+      ),
+    );
+  }
+}
+```
+
+```dart:home_screen.dart
+import 'package:flutter/material.dart';
+
+class Home extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(Icons.ac_unit),
+          Icon(Icons.access_alarms),
+        ],
+      ),
+    );
+  }
+}
+```
+
+## Usage
+
+<Step number="1" title="Ajouter du code" />
+
+- A l'intérieur de `main.dart` pointez votre home au widget nav: `home: Nav(),`
+- A l'intérieur de `nav.dart` ajoutez le code de la Bottom Navigation Bar. Votre nav doit etre à l'intérieur de la liste `_widgetOptions`. Dans cet exemple nous avons le `Home(),` screen.
+
+<Step number="2" title="More Than 3 Items" />
+
+Si vous avez besoin de plus de 3 éléments de la barre de navigation, vous devrez ajouter la propriété suivante à la barre de navigation :
+
+```dart
+...
+selectedFontSize: 13.0,
+unselectedFontSize: 13.0,
+type: BottomNavigationBarType.fixed, // addded line
+...
+```

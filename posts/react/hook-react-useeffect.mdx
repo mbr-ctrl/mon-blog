@@ -1,0 +1,73 @@
+---
+title: "Hook useEffect() dans Next.JS - React Hooks"
+description: "Découvrez ce qu'est useEffect et comment l'utiliser dans Next.JS."
+author: "Mubarak Mohamed"
+date: 2023-12-18
+tags: ["react", "useeffect", "nextjs", "react-hooks"]
+thumbnail: "firebase.png"
+---
+
+## What Are React Hooks?
+
+Publié dans React 16.8, [React Hooks](https://reactjs.org/docs/hooks-intro.html) vous permet d'utiliser l'état et d'autres fonctionnalités de React sans écrire de classe.
+
+Voici un exemple simple tiré du site Web reactjs.org :
+
+```javascript
+import React, { useState } from "react"; // <--- import the hook
+
+function Example() {
+  // Declare a new state variable, which we'll call "count"
+  const [count, setCount] = useState(0); // <--- useState is the hook
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+```
+
+Comme vous pouvez le voir, nous pouvons créer une variable d'état nommée count sur _uniquement_ une ligne en utilisant le hook `useState`.
+
+> **Remarque :** Les hooks React sont importés depuis React comme ceci : `import { yourHookHere } from 'react'`.
+
+## Utilisation de useEffect dans Next.JS
+
+L'ajout du hook `useEffect()` (ou [Effect Hook](https://reactjs.org/docs/hooks-effect.html)) dans [Next.js](https://nextjs.org/) n'est pas au pire comme on pourrait le penser. Jetons un coup d'œil à un exemple. Nous utiliserons `useEffect` pour ajouter un écouteur d'événement
+à gérer lorsqu'un utilisateur fait défiler. Nous enregistrerons ensuite sur la console la valeur scrollY. C'est ainsi que ce site Web ajoute dynamiquement
+le CSS dans la barre de navigation lors du défilement !
+
+> Le hook useEffect est utilisé pour effectuer des effets secondaires dans les composants de fonction.
+
+<Step number="1" title="Import useEffect from react" />
+
+```javascript
+import React, { useState, useEffect } from "react";
+```
+
+<Step number="2" title="Call the method and add code" />
+
+```javascript
+useEffect(() => {});
+```
+
+Nous pouvons ajouter tout ce que nous voulons ici. Ajoutons nos auditeurs d'événements :
+
+```javascript
+useEffect(() => {
+  window.addEventListener("scroll", handleScroll);
+  return () => {
+    window.removeEventListener("scroll", handleScroll);
+  };
+});
+```
+
+Enfin, créez la méthode handle scroll et enregistrez la valeur scrollY dans la console :
+
+```javascript
+const handleScroll = () => {
+  console.log(scrollY);
+};
+```

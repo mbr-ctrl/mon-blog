@@ -1,0 +1,98 @@
+---
+title: "Comment utiliser la fonction map() dans Dart"
+description: "Dart et Flutter ne renvoient pas de données lorsque j'utilise la fonction .map() sur la liste des tableaux."
+author: "Mubarak Mohamed"
+date: 2021-05-04
+tags: ["dart", "flutter"]
+thumbnail: "firebase.png"
+---
+
+## Le problème
+
+Récemment, je construisais une application [Flutter](https://flutter.dev/?gclid=Cj0KCQjwSQEBhDiARIsANV8H3aB8Bs-JYv8Pupzys4lwa3Trgh2gIfCWxUGsf4BuCIVxM0VJnT6sikaAmc_EALw_wcB&gclsrc=aw.ds) et
+J'avais besoin de cartographier un ensemble d'utilisateurs lorsqu'un utilisateur se connectait et de vérifier si son nom d'utilisateur, son mot de passe et sa réponse à la question de sécurité correspondaient à ce qui était
+dans la base de données (le userArray). J'ai essayé de faire quelque chose comme ceci :
+
+```dart
+var userArray = ['User 1', 'User 2', 'User 3'];
+
+userArray
+    .map((user) => {
+            if (user == 'User 1')
+            {
+                // log user in
+            } else {
+                    // don't log user in
+                }
+            });
+```
+
+> Remarque rapide : j'ai supprimé une partie de la logique spécifique à mon projet et n'ai inclus que les parties importantes afin qu'elles soient plus faciles à suivre.
+
+Ce code enregistre l'utilisateur _si_ il s'agit de l'utilisateur 1. Cela semble fonctionner, n'est-ce pas ? Malheureusement, ce n'est pas le cas. Il ne se cassera pas non plus. Plutôt,
+rien ne se passera. Cela rend le débogage difficile.
+
+## La Solution
+
+La solution simple consiste à ajouter « .toList() » à la fin de l'instruction map.
+
+```dart
+var userArray = ['User 1', 'User 2', 'User 3'];
+
+userArray
+    .map((user) => {
+            if (user == 'User 1')
+            {
+                // log user in
+            } else {
+                    // don't log user in
+                }
+            }).toList(); // add .toList() here!
+```
+
+## Pourquoi ceci fonctionne ?
+
+Contrairement à [JavaScript](https://www.javascript.com/), dans Dart lorsque vous utilisez `.map()` sur un objet, l' `Iterable` qui
+est renvoyé est « paresseux ». Cela signifie qu'il n'est pas évalué en appelant `.map()`. Pour « l'évaluer », nous devons appeler « .toList() ». Vous
+pouvez en savoir plus à ce sujet [ici](https://api.dart.dev/stable/2.12.4/dart-core/Iterable-class.html).
+
+Si vous souhaitez voir cela rapidement en action, ouvrez [DartPad](https://dartpad.dev/?null_safety=true) et collez le code ci-dessous (avec les instructions d'impression ajoutées)
+avec et sans `.toList()`.
+
+```dart
+void main() {
+  var userArray = ['User 1', 'User 2', 'User 3'];
+
+userArray
+    .map((user) => {
+            if (user == 'User 1')
+            {
+                print('logging user 1 in!')
+            } else {
+                    print('Not user 1, can\'t log in!')
+                }
+            }).toList(); // Supprimez .toList() pour ne rien voir en sortie!
+}
+```
+
+## Tiré de la documentation Flutter
+
+<br />
+
+### .map()
+
+> `Iterable<T>` `map<T>`(T Function(String) f)
+
+Renvoie un nouvel Iterable paresseux avec des éléments créés en appelant f sur chaque élément de cet Iterable dans l'ordre d'itération.
+
+Cette méthode renvoie une vue des éléments mappés. Tant que l'Iterable renvoyé n'est pas itéré, la fonction f fournie ne sera pas invoquée. Les éléments transformés ne seront pas mis en cache. Itérer plusieurs fois sur l'Iterable renvoyé invoquera la fonction fournie f plusieurs fois sur le même élément.
+
+Les méthodes sur l'itérable renvoyé sont autorisées à omettre d'appeler f sur tout élément où le résultat n'est pas nécessaire. Par exemple, elementAt ne peut appeler f qu'une seule fois.
+
+### .toList()
+
+> `List<Set<Set<void>>> toList({bool growable = true})`
+
+Crée une liste contenant les éléments de cet itérable.
+
+Les éléments sont dans l'ordre d'itération. La liste est de longueur fixe si growable est faux.

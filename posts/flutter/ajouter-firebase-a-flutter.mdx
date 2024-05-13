@@ -1,0 +1,100 @@
+---
+title: "Comment utiliser Firebase comme backend de Flutter ?"
+description: "Découvrez comment connecter facilement la base de données Firebase de Google à votre application mobile Flutter."
+author: Mubarak Mohamed
+date: 2024-03-03
+tags: ["flutter", "firebase"]
+thumbnail: "firebase.png"
+---
+
+## Introduction
+
+Chaque fois que je travaille avec [Firebase](https://console.firebase.google.com/u/0/), Il me semble toujours rencontrer de petits problèmes qui peuvent être très ennuyeux (mais simples) à résoudre. Lorsque j'ai essayé de connecter mon application [Flutter](https://flutter.dev/) à un backend Firebase pour l'un de mes projets personnels, j'ai rencontré quelques petits problèmes qui m'ont fait prendre du temps. Pour cette raison, j'ai décidé d'écrire un article simple et direct vous montrant comment connecter votre application Flutter à un backend Firebase pour IOS et Android. Après ce didacticiel, vous serez prêt à ajouter l'authentification, Cloud Firestore ou toute autre fonctionnalité Firebase de votre choix.
+
+## Prerequis
+
+Pour maintenir ce tutoriel court, je m'attends à ce que vous ayez ce qui suit :
+
+- Vous avez Flutter installé sur votre machine
+- Vous avez déjà commencé un projet Flutter et êtes prêt à le connecter à Firebase
+
+## Création d'un projet Firebase
+
+Avant de commencer à travailler avec Flutter, nous devons créer un projet Firebase.
+
+1. Accédez à [Firebase console](https://console.firebase.google.com/)
+2. Cliquez sur **Ajouter un projet**
+3. Entrez un nom de projet
+4. Choisissez si vous souhaitez activer Google Analytics (je le recommande). Vous pouvez toujours activer cela plus tard.
+5. Choisissez avec quel compte vous souhaitez associer ce projet
+6. Cliquez sur **Créer un projet**
+
+Après une minute ou deux, votre projet sera créé et vous serez redirigé vers la page d'aperçu.
+
+## Ajouter Firebase à Android
+
+Ensuite, nous allons ajouter Firebase à notre version Android. Nous devrons le faire pour IOS et Android séparément bien que le processus soit similaire.
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/console.png)
+
+- Cliquez sur l'icône Android depuis la page d'aperçu
+- Terminez l'étape Enregistrer l'application.
+
+Pour le nom de package Android, utilisez le format : _com.[votre nom ou nom d'entreprise].[nom du projet]_. Pour le surnom de l'application, utilisez le nom que vous souhaitez.
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/add.png)
+
+Etape 2
+
+- Téléchargez le fichier de configuration et placez-le au niveau de l'application (dans le dossier de l'application).
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/app-level.png)
+
+- Dans le build.gradle au niveau du projet, ajoutez ce qui suit :
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/build.gradle.png)
+
+- Dans le build.gradle au niveau de l'application, ajoutez ce qui suit :
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/app-level-build.gradle.png)
+
+Enfin, dans le fichier build.gradle au niveau de l'application (même fichier que ci-dessus), recherchez applicationId et changez-le en le nom que vous avez choisi à l'étape 2. Dans mon cas, j'ai utilisé _com.benjamincarlson.medium_tutorial_.
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/name.png)
+
+À ce stade, nous avons terminé. Exécutez l'application avec un émulateur Android et assurez-vous que tout fonctionne. Vous devriez voir l'image suivante ci-dessous si tout fonctionne comme prévu.
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/working-android.png)
+
+## Ajouter Firebase à IOS
+
+Comme je l'ai dit plus tôt, c'est similaire à ce que nous avons fait pour Android.
+
+Cliquez sur l'icône IOS depuis la page d'aperçu
+
+Entrez l'ID de bundle IOS. Vous pouvez le trouver en ouvrant votre projet dans Xcode -> cliquez sur runner (en haut à droite) -> onglet général -> Identité
+
+![Firebase Console](/content/articles/connect-flutter-to-firebase/bundle-id.png)
+
+J'ai changé le mien de com.example.mediumTutorial à com.benjamincarlson.mediumTutorial.
+
+- Entrez un surnom d'application et un identifiant de magasin d'applications (tous deux facultatifs)
+
+- Téléchargez le fichier de configuration. Ajoutez le fichier à la racine du projet en ouvrant Xcode, en cliquant avec le bouton droit sur runner, et en cliquant sur "ajouter des fichiers à runner". Vous devez ajouter le fichier directement via Xcode sinon vous obtiendrez une erreur et l'application ne se lancera pas.
+
+- Passez les 2 prochaines étapes que Firebase vous demande de faire
+
+- Exécutez l'application IOS et assurez-vous que tout fonctionne correctement
+
+## Conclusion
+
+La dernière chose que vous voulez faire est d'ouvrir `pubspec.yaml` et d'ajouter ce qui suit sous dépendances :
+
+```dart:pubspec.yaml
+firebase_auth: ^0.14.0+5
+cloud_firestore: ^0.12.9+4
+```
+
+Tous les autres outils Firebase que vous souhaitez utiliser seront ajoutés ici également.
+
+C'est tout ! J'espère que vous avez trouvé cet article utile et que vous avez réussi à connecter avec succès votre application Flutter à Firebase de Google !

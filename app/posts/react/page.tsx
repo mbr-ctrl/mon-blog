@@ -1,12 +1,12 @@
-import NavBar from "./_components/NavBar";
+import NavBar from "../../_components/NavBar";
 import { PostMeta } from "@/lib/types";
 import { getSortedPostsData } from "@/lib/post";
-import PostData from "./_components/PostData";
-import Footer from "./_components/Footer";
-import Banner from "./_components/Banner";
-import Categories from "./_components/Categories";
+import PostData from "../../_components/PostData";
+import Footer from "../../_components/Footer";
+import Banner from "../../_components/Banner";
+import Categories from "../../_components/Categories";
 
-export default function Home({ allPosts }: { allPosts: PostMeta[] }) {
+export default function ReactPage({ allPosts }: { allPosts: PostMeta[] }) {
   const posts = getSortedPostsData("react");
   return (
     <main className="min-h-screen text--colors_default bg--default container mx-auto">

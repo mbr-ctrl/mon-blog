@@ -4,6 +4,7 @@ export type PostMeta = {
   description: string;
   date: Date;
   tags: string[];
+  thumbnail: string;
 };
 
 export type Post = {

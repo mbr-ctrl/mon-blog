@@ -8,7 +8,7 @@ import Author from "@/app/_components/Author";
 import Footer from "@/app/_components/Footer";
 
 export default async function page({ params }: { params: { slug: string } }) {
-  const post = await getPostBySlug(params.slug, "react");
+  const post = await getPostBySlug(params.slug, "tailwindcss");
   const seoMeta = {
     title: post.frontmatter.title, // Set page title
     description: post.frontmatter.description || "",
@@ -34,7 +34,7 @@ export default async function page({ params }: { params: { slug: string } }) {
           ))}
         </div>
 
-        <article className="prose prose-code:w-96 max-w-none mt-4 p-2 text-justify">
+        <article className="prose max-w-none mt-4 p-2 text-justify">
           <MDXComponent code={post.code} />
         </article>
       </div>
@@ -45,7 +45,7 @@ export default async function page({ params }: { params: { slug: string } }) {
 }
 
 export async function getStaticPaths() {
-  const slugs = getPostsSlug("react");
+  const slugs = getPostsSlug("tailwindcss");
 
   return {
     paths: slugs, // Use the paths variable defined above

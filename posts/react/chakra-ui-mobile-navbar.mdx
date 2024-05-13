@@ -1,0 +1,98 @@
+---
+title: "Mobile Navbar avec Chakra-UI (Drawer Component)"
+description: "Utilisez le composant tiroir de Chakra UI pour créer une simple barre de navigation mobile."
+author: "benjamin-carlson.mdx"
+date: 2023-12-12
+tags: ["chakra-ui", "navigation"]
+thumbnail: "firebase.png"
+---
+
+## Introduction
+
+Dans cet extrait, nous allons créer une simple barre de navigation mobile à l'aide du [drawer component](https://chakra-ui.com/docs/overlay/drawer).
+
+<Step number="1" title="Créer un Bouton avec icone de Hamburger" />
+
+Pour commencer, nous allons créer un simple `IconButton` pour ouvrir la barre de navigation. Déclarez certaines propriétés de base telles que `aria-label`, `m`, et `zIndex`.
+
+```javascript
+const Navbar = () => {
+  return (
+    <>
+      <IconButton
+        pos="fixed"
+        right={0}
+        top={0}
+        m={3}
+        zIndex="10"
+        aria-label="Open Menu"
+        icon={<HamburgerIcon />}
+        onClick={onOpen} // what's this?
+      />
+    </>
+  );
+};
+
+export default NavBarTop;
+```
+
+Vous remarquerez que la propriété `onClick` est définie sur `onOpen`. Ceci vient de `useDisclosure`. [Chakra UI](https://chakra-ui.com/) nous donne ceci avec `isOpen` et `onClose` pour gérer l'état du tiroir.
+
+<Step number="2" title="Adding The Drawer" />
+
+Importer le drawer component and et tous les autres composants.
+
+```javascript
+import {
+  useDisclosure,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+} from "@chakra-ui/react";
+```
+
+Maintenant, on peut utiliser le composant `Drawer` pour créer le tiroir. Nous pouvons ajouter ceci juste sous le `IconButton` que je ne montrerai pas ci-dessous par souci de concision.
+
+```javascript
+<Drawer onClose={onClose} isOpen={isOpen} size="sm">
+  <DrawerOverlay />
+  <DrawerContent>
+    <DrawerHeader borderBottomWidth="3px">
+      <Heading>I am the Header!</Heading>
+    </DrawerHeader>
+    <DrawerBody>
+      <Text>
+        Je suis le corps ! Ajoutez tout ici, même des composants comme Flex et
+        Bouton.
+      </Text>
+      <Flex>
+        <Button />
+      </Flex>
+    </DrawerBody>
+  </DrawerContent>
+</Drawer>
+```
+
+La dernière étape est d'ajouter le hook `useDisclosure` au-dessus de l’instruction return.
+
+```javascript
+const { isOpen, onOpen, onClose } = useDisclosure();
+```
+
+<Step number="3" title="More Improvements" />
+
+Enfin, ajoutons un bouton pour fermer le drawer (tiroir). Nous pouvons utiliser la méthode `onClose` pour cela. une fois de plus je ne répète aucun code par souci de concision.
+
+```javascript
+<IconButton
+  size="md"
+  onClick={onClose}
+  icon={<CloseIcon fontSize="xs" />}
+  borderRadius={5}
+/>
+```
+
+Si vous souhaitez en savoir plus visitez la documentaion sur [Drawer props](https://chakra-ui.com/docs/overlay/drawer#props).

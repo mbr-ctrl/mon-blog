@@ -1,0 +1,337 @@
+---
+title: "Créez une application Web Todo à l'aide de Next.js, Firebase, Chakra UI + React Hooks"
+description: "Créez une application Web de tâches à l'aide des hooks Next.js, Firebase, Chakra UI et React (useState et useEffect). Il s'agit d'une application complète avec les fonctionnalités suivantes : écrire sur Cloud Firestore, lire des données à l'aide d'un instantané + useEffect, supprimer une tâche, se connecter avec différents comptes et protéger les données."
+author: "benjamin-carlson.mdx"
+date: 2024-01-17
+tags: ["chakra-ui", "nextjs", "firebase"]
+thumbnail: "firebase.png"
+githubURL: "https://github.com/bjcarlson42/overly-complicated-todo-app"
+---
+
+## Introduction
+
+Créer une application Todo est une pratique courante lorsque vous essayez d'apprendre une nouvelle pile technologique. Dans ce tutoriel, je vais vous montrer comment créer une application de tâches à l'aide de la pile suivante :
+
+- [Next.js](https://nextjs.org) pour le framework JavaScript
+- [Chakra-UI](https://chakra-ui.com) pour le framework CSS
+- [Firebase](https://firebase.google.com) pour l'authentification et le backend
+- [React hooks](https://reactjs.org/docs/hooks-intro.html) pour gérer les données localement
+
+Passons au codage !
+
+## Amorçage avec `next-firebase-auth`
+
+Je vais construire cela comme n’importe quel autre projet. Cela signifie que je ne repartirai pas de zéro. Au lieu de cela, nous clonerons [ce dépôt](https://github.com/gladly-team/next-firebase-auth) sur lequel Firebase Auth est déjà implémenté. Allez-y et clonez le dépôt, puis « cd » dans le dossier « exemple ». Il s'agit du code source de Next.js.
+
+Pour rappel, vous pouvez cloner ce repo depuis votre terminal en utilisant :
+
+```bash
+git clone https://github.com/gladly-team/next-firebase-auth.git
+
+then...
+
+cd example
+```
+
+Une fois que vous avez les fichiers de démarrage, n'hésitez pas à les ouvrir dans l'IDE de votre choix.
+
+### .env.local
+
+Vous remarquerez que si vous essayez d'exécuter l'application (en utilisant `yarn dev`), vous obtiendrez une erreur. En effet, nous devons modifier les valeurs secrètes à l'intérieur de « .env.local.example » en nos valeurs Firebase. Tout d'abord, copiez tout ce qui se trouve à l'intérieur de `.env.local.example` dans un nouveau fichier nommé `.env.local`.
+
+```bash:.env.local.example
+# Copiez ce fichier sous ".env.local".
+# Mettez-les à jour avec les valeurs de votre application Firebase.
+FIREBASE_CLIENT_EMAIL=my-example-app-email@example.com
+NEXT_PUBLIC_FIREBASE_PUBLIC_API_KEY=MyExampleAppAPIKey123
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=my-example-app.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://my-example-app.firebaseio.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=my-example-app-id
+
+# Votre clé privée Firebase.
+# Lors de l'utilisation de Vercel, ajoutez la clé privée avec des guillemets doubles
+# via la CLI, pas le tableau de bord Vercel :
+# les secrets de Vercel ajoutent une clé privée Firebase '"ma-clé-ici"'
+# Ensuite, utilisez `JSON.parse` dans l'application. Voir:
+# https://github.com/vercel/vercel/issues/749#issuecomment-707515089
+FIREBASE_PRIVATE_KEY='"une-clé-ici"'
+
+# Secrets utilisés pour signer les cookies.
+COOKIE_SECRET_CURRENT=someSecretValue
+COOKIE_SECRET_PREVIOUS=anotherSecretValue
+
+# Cookie options.
+NEXT_PUBLIC_COOKIE_SECURE=false # set to true in HTTPS environment
+```
+
+Next, create a Firebase project and create a web project inside of it.
+
+![Image de la création d'une application Web Firebase](/images/todo-app-nextjs/create-web-app.png)
+
+Allez-y et activez l'authentification par e-mail/mot de passe, le cloud Firestore et la base de données en temps réel.
+
+![Image of left sidebar](/images/todo-app-nextjs/left-sidebar.png)
+
+Maintenant, allez dans les paramètres du projet. Dans l'onglet général, vous retrouverez la plupart de vos valeurs secrètes.
+
+![Image of secrets](/images/todo-app-nextjs/secrets.png)
+
+Pour obtenir les valeurs restantes, cliquez sur l'onglet "Comptes de service" et "Générer une nouvelle clé privée". Ouvrez le fichier téléchargé. Les valeurs secrètes restantes telles que la clé API (la chaîne super longue) peuvent être trouvées ici.
+
+![Image of generating a private key](/content/articles/todo-app-nextjs-chakraui-firebase/generate-private-key.png)
+
+> Pour les 2 secrets des cookies, générez simplement 2 chaînes aléatoires !
+
+À ce stade, vous devriez pouvoir vous connecter au site en utilisant votre e-mail et votre mot de passe.
+
+## Intégrez Chakra-UI
+
+### Ajout des Dependences
+
+Une fois cette opération terminée, nous pouvons ajouter Chakra-UI à notre projet. Ajoutez d'abord les dépendances :
+
+```bash
+yarn add @chakra-ui/react @emotion/react@^11 @emotion/styled@^11 framer-motion@^4
+```
+
+### Wrapper avec ChakraProvider
+
+Next, wrap `_app.js` with the `<ChakraProvider>`.
+
+```javascript:_app.js
+import React from 'react'
+import '../styles/globals.css'
+import initAuth from '../utils/initAuth'
+import { ChakraProvider } from "@chakra-ui/react" // <- add this
+
+initAuth()
+
+function MyApp({ Component, pageProps }) {
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return (
+    <ChakraProvider> // <- add this
+      <Component {...pageProps} />
+    </ChakraProvider> // <- add this
+  )
+}
+
+export default MyApp
+```
+
+## Créer `todo.js`
+
+All of the code in this turoial will be added in a file named `todo.js`. You can go ahead and create this inside of the `pages` directory.
+We will start by adding a bunch of imports.
+
+### Ajouter les Imports
+
+```javascript:todo.js
+import React, { useState, useEffect } from 'react'
+import {
+    Flex,
+    Heading,
+    InputGroup,
+    InputLeftElement,
+    Input,
+    Button,
+    Text,
+    IconButton,
+    Divider,
+} from "@chakra-ui/react"
+import { AddIcon, DeleteIcon, StarIcon } from "@chakra-ui/icons"
+import {
+    useAuthUser,
+    withAuthUser,
+    withAuthUserTokenSSR,
+    AuthAction,
+} from 'next-firebase-auth'
+import getAbsoluteURL from '../utils/getAbsoluteURL'
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+```
+
+- line 1 are react imports
+- lines 2-13 are chakra ui imports
+- lines 14-20 are `next-firebase-auth` imports
+- lines 21-22 are firebase imports
+
+### Defining Our Body
+
+Next, define our react functional component with some basic styles:
+
+```javascript:todo.js
+// imports here
+
+const Todo = () => {
+    return (
+        <Flex flexDir="column" maxW={800} align="center" justify="center" minH="100vh" m="auto" px={4}>
+
+        </Flex>
+    )
+}
+
+export const getServerSideProps = withAuthUserTokenSSR()
+
+export default withAuthUser()(Todo)
+```
+
+I'll go ahead and add the rest of the UI elements.
+
+```javascript:todo.js
+<Flex flexDir="column" maxW={800} align="center" justify="center" minH="100vh" m="auto" px={4}>
+    <Flex justify="space-between" w="100%" align="center">
+        <Heading mb={4}>Welcome, {AuthUser.email}!</Heading>
+        <IconButton ml={2} onClick={AuthUser.signOut} icon={<StarIcon />} />
+    </Flex>
+
+        <InputGroup>
+            <InputLeftElement
+                pointerEvents="none"
+                children={<AddIcon color="gray.300" />}
+            />
+            <Input type="text" placeholder="Learn Chakra-UI & Next.js" />
+            <Button
+                ml={2}
+            >
+                Add Todo
+            </Button>
+        </InputGroup>
+</Flex>
+```
+
+If you run the app you should see some nice output!
+
+## Writing Data to Firebase's Cloud Firestore
+
+### useState
+
+To write data to cloud firestore, we will first need to get the data from the user and hold it locally. We can use `useState` for this. Add the
+following code:
+
+```javascript:todo.js
+const [input, setInput] = useState('')
+const [todos, setTodos] = useState([])
+```
+
+Now we can store the users input value in the `input` variable and when we fetch the data back, we can store it in the
+`todos` variable.
+
+### onClick + onChange
+
+To get the data, we can use `onClick` and `onChange`.
+
+```javascript:todo.js
+<InputGroup>
+        <InputLeftElement
+            pointerEvents="none"
+            children={<AddIcon color="gray.300" />}
+        />
+        <Input type="text" onChange={(e) => setInput(e.target.value)} placeholder="Learn Chakra-UI & Next.js" />
+        <Button
+            ml={2}
+            onClick={() => sendData()}
+        >
+            Add Todo
+        </Button>
+    </InputGroup>
+```
+
+If you add some `console.logs` and type in some data, you will see that this works! The next step is to create the `sendData` method and send the data to Firebase.
+
+We can wrap everything inside of a try catch loop to handle errors. To interact with Firestore, we can use `firebase.firestore()`.
+
+We will store each users todo's inside of their own collection using their id. Each individual toto will be stored inside a doc, using the todo name and the doc name.
+
+### Sending The Data
+
+Lastly, use `.set` to set the data! We'll pass in the `timestamp` as well so we can order todos better later on.
+
+```javascript:todo.js
+const sendData = () => {
+        try {
+            // try to update doc
+            firebase
+                .firestore()
+                .collection(AuthUser.id) // each user will have their own collection
+                .doc(input) // set the collection name to the input so that we can easily delete it later on
+                .set({
+                    todo: input,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                })
+                .then(console.log('Data was successfully sent to cloud firestore!'))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+```
+
+## Fetching Data from Firebase's Cloud Firestore
+
+We can fetch data in a similar fashon. We'll fetch everything inside of `useEffect` so we can listen to changes in real time.
+
+```javascript:todo.js
+useEffect(() => {
+        AuthUser.id &&
+            firebase
+                .firestore()
+                .collection(AuthUser.id)
+                .orderBy('timestamp', 'desc')
+                .onSnapshot(snapshot => {
+                    setTodos(snapshot.docs.map(doc => doc.data().todo))
+                })
+    })
+```
+
+Now, we have all the todo items inside of the `todos` variable! Let's map over them and display it to the user.
+
+### Displaying Todos To User
+
+```javascript:todo.js
+{todos.map((t, i) => {
+                return (
+                    <>
+                        {i > 0 && <Divider />}
+                        <Flex
+                            key={i}
+                            w="100%"
+                            p={5}
+                            my={2}
+                            align="center"
+                            borderRadius={5}
+                            justifyContent="space-between"
+                        >
+                            <Flex align="center">
+                                <Text fontSize="xl" mr={4}>{i + 1}.</Text>
+                                <Text>{t}</Text>
+                            </Flex>
+                            <IconButton onClick={() => deleteTodo(t)} icon={<DeleteIcon />} />
+                        </Flex>
+                    </>
+                )
+            })}
+```
+
+## Adding Delete
+
+Lastly, let's add delete functionality. as you can see, we already have the `deleteTodo` method. Let's create this above.
+
+To delete, we can grab the collection, grab the doc, and call `.delete`. Recall the collection name is the user's id and the doc name is the todo.
+
+```javascript:todo.js
+const deleteTodo = (t) => {
+        try {
+            firebase
+                .firestore()
+                .collection(AuthUser.id)
+                .doc(t)
+                .delete()
+                .then(console.log('Data was successfully deleted!'))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+```
+
+## Conclusion
+
+We have now created a todo web app with Firebase Auth, Next.js as the JS framework, Chakra UI as the CSS framework, Firebase Cloud Firestore as the backend, and React Hooks to handle data locally. If you want to look at any of these in more detail, check out the recommended posts below!

@@ -1,0 +1,87 @@
+---
+title: "Comment intégrer Google Analytics"
+description: "Connectez Google Analytics à votre site Web Next.js et suivez les clics, les défilements, les pages vues, etc."
+author: "Mubarak Mohamed"
+date: 2024-02-06
+tags: ["nextjs", "google-analytics"]
+thumbnail: "firebase.png"
+---
+
+## Introduction
+
+Ajouter Google Analytics à un site Web Next.js semble compliqué, mais ce n'est pas si difficile. Pour commencer, assurez-vous d'avoir
+un compte [Google Analytics](https://analytics.google.com/) avec votre projet configuré.
+
+## Ajouter le suivi de code
+
+Créez un dossier dans votre répertoire racine Next.js appelé `lib`. Collez ce
+code:
+
+```javascript:gtag.js
+export const GA_TRACKING_ID = 'G-XXXXXXXXXX'
+
+// https://developers.google.com/analytics/devguides/collection/gtagjs/pages
+export const pageview = (url) => {
+    window.gtag('config', GA_TRACKING_ID, {
+        page_path: url,
+    })
+}
+
+// https://developers.google.com/analytics/devguides/collection/gtagjs/events
+export const event = ({ action, category, label, value }) => {
+    window.gtag('event', action, {
+        event_category: category,
+        event_label: label,
+        value: value,
+    })
+}
+```
+
+Remplacez `'G-XXXXXXXXXX'` avec votre identifiant de suivi (celui-ci peut être trouvé dans le panneau d'administration Google Analytics de votre site Web).
+
+## Ajoutez du GTAG à Document.js
+
+Ouvrez`_document.js`. Si vous n'avez pas encore créé ce fichier, suivez la [documentaion](https://nextjs.org/docs/advanced-features/custom-document) et
+crééz un fichier `_document` personnalisé pour votre site. A l'intérieur importons notre gtag pour l'utiliser.
+
+```javascript:_document.js
+import { GA_TRACKING_ID } from '../lib/gtag'
+// other imports
+
+export default class MyDocument extends NextDocument {
+    render() {
+        return (
+            <Html lang="en">
+
+                {/* other code */}
+
+            <Head>
+                    {/* Global Site Tag (gtag.js) - Google Analytics */}
+                    <script
+                        async
+                        src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+                    />
+                    <script
+                        dangerouslySetInnerHTML={{
+                            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_TRACKING_ID}', {
+              page_path: window.location.pathname,
+            });
+          `,
+                        }}
+                    />
+            </Head>
+
+            {/* Other code */}
+
+        </Html>
+        )
+    }
+}
+```
+
+C'est ça! vous pouvez le [deployer sur Vercel](https://vercel.com/) (ou un autre hébergeur de votre choix) vous devriez voir des analyses arriver
+après environ 5 minutes.

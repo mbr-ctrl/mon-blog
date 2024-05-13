@@ -1,0 +1,833 @@
+---
+title: "Connectez Firebase à Next.js"
+description: "Learn how to connect Next.js to Google's Firebase and use authentication, cloud Firestore, Realtime Database, and cloud storage."
+author: "benjamin-carlson.mdx"
+date: 2024-02-15
+tags: ["firebase", "nextjs"]
+thumbnail: "firebase.png"
+---
+
+## Introduction
+
+Dans ce tutoriel, nous allons intégrer [Firebase](https://firebase.google.com/) à un site Web [Next.js](https://nextjs.org)
+Si vous utilisez un autre framework basé sur React, le processus devrait être très similaire et vous devriez tirer quelque chose de ce tutoriel.
+
+Nous allons d'abord connecter le site Web à Firebase (ce qui est une étape en soi),
+puis nous ajouterons les fonctionnalités suivantes dans l'ordre suivant :
+
+- [Authentication](https://firebase.google.com/docs/auth)
+- [Cloud Firestore](https://firebase.google.com/docs/firestore)
+- [Realtime Database](https://firebase.google.com/docs/database)
+- [Storage](https://firebase.google.com/docs/storage)
+
+## Initialisation de Firebase
+
+Tout d'abord, assurez-vous d'avoir un projet Firebase. Vous pouvez en créer un ici si vous n'en avez pas.
+
+Créez un dossier appelé `firebase` aet à l'intérieur de ce dossier, créez un fichier appelé `initFirebase.js`. Nous ajouterons toute notre fonctionnalité liée à Firebase dans ce dossier.
+
+Maintenant, installez les 2 dépendances:
+
+```bash
+yarn add firebase firebase-admin
+```
+
+Introduction
+Dans ce tutoriel, nous allons ajouter Firebase à un site Web Next.js. Si vous utilisez un autre framework basé sur React, le processus devrait être très similaire et vous devriez tirer quelque chose de ce tutoriel.
+
+Nous allons d'abord connecter le site Web à Firebase (ce qui est une étape en soi), puis nous ajouterons les fonctionnalités suivantes dans l'ordre suivant :
+
+Authentification
+Cloud Firestore
+Base de données en temps réel
+Stockage
+Initialisation de Firebase
+Tout d'abord, assurez-vous d'avoir un projet Firebase. Vous pouvez en créer un ici si vous n'en avez pas.
+
+Créez un dossier appelé firebase et à l'intérieur de ce dossier, créez un fichier appelé initFirebase.js. Nous ajouterons toute notre fonctionnalité liée à Firebase dans ce dossier.
+
+Maintenant, installez les 2 dépendances :
+
+bash
+Copy code
+yarn add firebase firebase-admin
+Importez-les dans `initFirebase.js`.
+
+Si ce n'est pas déjà fait, créez une application Web dans votre projet Firebase. Une fois que vous avez suivi ces étapes, vous pourrez télécharger vos informations d'identification. À partir de là, créez un fichier appelé .env et collez-y les secrets.
+Votre fichier devrait ressembler au mien (Sauf avec vos variables secrètes bien sûr !).
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+
+# for firebase-admin
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
+```
+
+Nous pouvons maintenant utiliser ces secrets pour initialiser Firebase. Votre fichier `initFirebase` devrait ressembler à ceci :
+
+```javascript:initFirebase.js
+import firebase from 'firebase/app'
+// the below imports are option - comment out what you don't need
+import 'firebase/auth'
+import 'firebase/firestore'
+import 'firebase/storage'
+import 'firebase/analytics'
+import 'firebase/performance'
+
+const clientCredentials = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+}
+```
+
+Enfin, exportons une fonction appelée `initFirebase()` qui utilise ces informations d'identification pour initialiser Firebase !
+
+```javascript:initFirebase.js
+export default function initFirebase() {
+    if (!firebase.apps.length) {
+        firebase.initializeApp(clientCredentials)
+        // Check that `window` is in scope for the analytics module!
+        if (typeof window !== 'undefined') {
+            // Enable analytics. https://firebase.google.com/docs/analytics/get-started
+            if ('measurementId' in clientCredentials) {
+                firebase.analytics()
+                firebase.performance()
+            }
+        }
+        console.log('Firebase was successfully init.')
+    }
+}
+```
+
+Maintenant que Firebase est initialisé, nous pouvons commencer à l'utiliser.
+
+## Cloud Firestore
+
+Commençons par Firestore.
+
+### Écriture
+
+Créez un dossier nommé `components`. À l'intérieur de ce dossier, créez un dossier appelé
+`cloudFirestore`. Tous nos composants liés à Cloud Firestore iront ici.
+À l'intérieur, créez un fichier nommé `write.js`. Ici, nous ferons:
+
+1. Import Firebase
+2. Import cloud Firestore
+
+Ensuite, créez un composant React de base nommé `WriteToCloudFirestore`. Votre fichier devrait ressembler à ceci:
+
+```javascript:Write.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+const WriteToCloudFirestore = () => {
+    return (
+        <div style={{ margin: '5px 0' }}>
+
+        </div>
+    )
+}
+
+export default WriteToCloudFirestore
+```
+
+Pour envoyer des données, nous devons créer une fonction `sendData`. Ensuite, nous invoquerons cette fonction sur une pression de bouton.
+Nous l'envelopperons également dans une boucle try catch.
+
+```javascript:Write.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+const WriteToCloudFirestore = () => {
+    const sendData = () => {
+        try {
+            // écrire les données ici
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
+    }
+
+    return (
+        <div style={{ margin: '5px 0' }}>
+            <button onClick={sendData}>Envoyer les données à Cloud Firestore</button>
+        </div>
+    )
+}
+
+export default WriteToCloudFirestore
+```
+
+Pour écrire des données, accédez à la méthode firestore sur l'objet firebase. Nous récupérons la collection appelée `myCollection`(peut être n'importe quel nom que vous aimez),
+nous récupérons le document appelé `my_document`(peut être n'importe quel nom que vous aimez), puis utilisons la méthode `set()` Ça ressemble à ça :
+
+```javascript:Write.js
+firebase
+    .firestore()
+    .collection('myCollection')
+    .doc('my_document') // laissez tel quel pour qu'un nom de document unique aléatoire soit attribué
+    .set({
+        string_data: 'Benjamin Carlson',
+        number_data: 2,
+        boolean_data: true,
+        map_data: { stringInMap: 'Hi', numberInMap: 7 },
+        array_data: ['text', 4],
+        null_data: null,
+        time_stamp: firebase.firestore.Timestamp.fromDate(new Date('December 17, 1995 03:24:00')),
+        geo_point: new firebase.firestore.GeoPoint(34.714322, -131.468435)
+    })
+    .then(alert('Les données ont été envoyées avec succès à Cloud Firestore !'))
+```
+
+Lorsque nous mettons tout cela ensemble, cela ressemble à ceci:
+
+```javascript:Write.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+const WriteToCloudFirestore = () => {
+    const sendData = () => {
+        try {
+            firebase
+                .firestore()
+                .collection('myCollection')
+                .doc('my_document') // laissez tel quel pour qu'un nom de document unique
+                .set({
+                    string_data: 'Mubarak Moubarak',
+                    number_data: 2,
+                    boolean_data: true,
+                    map_data: { stringInMap: 'Hi', numberInMap: 7 },
+                    array_data: ['text', 4],
+                    null_data: null,
+                    time_stamp: firebase.firestore.Timestamp.fromDate(new Date('December 17, 1995 03:24:00')),
+                    geo_point: new firebase.firestore.GeoPoint(34.714322, -131.468435)
+                })
+                .then(alert('Les données ont été envoyées avec succès vers le cloud Firestore !'))
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
+    }
+
+    return (
+        <button onClick={sendData}>Envoyer des données vers Cloud Firestore</button>
+    )
+}
+
+export default WriteToCloudFirestore
+```
+
+Immortez ce composant à l'intérieur de `index.js` et appuyez sur le bouton. Vous devriez voir une alerte de réussite
+et si vous accédez à [Firbase](https://console.firebase.google.com) vous devriez voir les données.
+
+![Write Success Image](/content/articles/add-firebase-to-nextjs/write-success.png)
+
+### Lecture
+
+Lisons maintenant ces données. Créez un fichier nommé `Read.js` dans le même dossier que `Write.js`.
+Créez un composant nommé `ReadDataFromCloudFirestore()`. À l'intérieur, créez un bouton, avec
+un événement onClick qui appelle une fonction nommée `readData`. Votre fichier devrait ressembler à ceci :
+
+```javascript:Read.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+const ReadDataFromCloudFirestore = () => {
+    const readData = () => {
+
+    }
+
+    return (
+        <button onClick={readData}>Lecture des données depuis Cloud Firestore</button>
+    )
+}
+
+export default ReadDataFromCloudFirestore
+```
+
+Maintenant, à l'intérieur de la méthode, lisons les données en appelant la méthode firestore() hors de la base de feu.
+objet. Sélectionnez la collection et le document de la même manière que précédemment. Ensuite, utilisez `onSnapshot`
+méthode. À l’intérieur de celui-ci, créez une fonction et console.logez les données. Les données se trouvent à l'intérieur de doc.data(). Le document
+l'objet est la réponse entière. Voici le dossier complet :
+
+```javascript:Read.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+
+const ReadDataFromCloudFirestore = () => {
+    const readData = () => {
+        try {
+            firebase
+                .firestore()
+                .collection('myCollection')
+                .doc('my_document')
+                .onSnapshot(function (doc) {
+                    console.log(doc.data())
+                })
+            alert('Les données ont été récupérées avec succès depuis le cloud Firestore ! Fermez cette alerte et vérifiez la console pour la sortie.')
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
+    }
+
+    return (
+        <button onClick={readData}>Lecture des données depuis Cloud Firestore</button>
+    )
+}
+
+export default ReadDataFromCloudFirestore
+```
+
+Importez cette fonction dans `index.js` et vous verrez vos données dans la console !
+
+## Authentification
+
+### Flux d'authentification contextuel
+
+Créez un dossier appelé `Auth` à l'intérieur de votre dossier de composants. A l'intérieur de là,
+créer un fichier nommé `FirebaseAuth.js`. Nous utiliserons le flux contextuel de connexion de l'interface utilisateur de Ract Firebase.
+bibliothèque. Nous allons commencer par importer ce dont nous avons besoin.
+
+```javascript:FirebaseAuth.js
+import initFirebase from '../../firebase/initFirebase'
+import { useEffect, useState } from 'react'
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import { setUserCookie } from '../../firebase/userCookies'
+import { mapUserData } from '../../firebase/mapUserData'
+```
+
+Notez que nous n'avons pas créé le `setUserCookie` ni le fichier `setUserCookie`.
+
+Vous remarquerez peut-être que nous importons `initFirebase` quand nous l'avons déjà dans le fichier `index.js`. Ceci
+car il est plus logique d'initialiser Firebase dans le flux d'authentification plutôt que dans la page d'index, car si vous construisez
+une application volumineuse, l'utilisateur ne démarrera pas toujours par la page d'index.
+Next, paste the code below:
+
+```javascript:FirebaseAuth.js
+initFirebase() // initialize firebase
+
+const firebaseAuthConfig = {
+    signInFlow: 'popup',
+    // Auth providers
+    // https://github.com/firebase/firebaseui-web#configure-oauth-providers
+    signInOptions: [
+        {
+            provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
+            requireDisplayName: false,
+        },
+        // add additional auth flows below
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
+        firebase.auth.GithubAuthProvider.PROVIDER_ID,
+    ],
+    signInSuccessUrl: '/',
+    credentialHelper: 'none',
+    callbacks: {
+        signInSuccessWithAuthResult: async ({ user }, redirectUrl) => {
+            const userData = mapUserData(user)
+            setUserCookie(userData)
+        },
+    },
+}
+```
+
+C'est dire à quel point il est simple de créer un flux d'authentification contextuel. Vous remarquerez que je propose plusieurs options de connexion et que je définis les données utilisateur et les cookies,
+ce que, encore une fois, nous n’avons pas encore mis en œuvre.
+
+Enfin, créez le composant réel et renvoyez cette configuration dans le flux d'authentification contextuel que nous avons importé depuis React ui.
+
+```javascript:FirebaseAuth.js
+const FirebaseAuth = () => {
+    // Do not SSR FirebaseUI, because it is not supported.
+    // https://github.com/firebase/firebaseui-web/issues/213
+    const [renderAuth, setRenderAuth] = useState(false)
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setRenderAuth(true)
+        }
+    }, [])
+    return (
+        <div>
+            {renderAuth ? (
+                <StyledFirebaseAuth
+                    uiConfig={firebaseAuthConfig}
+                    firebaseAuth={firebase.auth()}
+                />
+            ) : null}
+        </div>
+    )
+}
+
+export default FirebaseAuth
+```
+
+Dans notre dossier pages, créez un fichier nommé `auth.js` et ajoutez le composant que nous venons de créer.
+
+```javascript:auth.js
+import FirebaseAuth from '../components/auth/FirebaseAuth'
+
+const Auth = () => {
+    return (
+        <div>
+            <div>
+                <FirebaseAuth />
+                <p><a href="/">Go Home</a></p>
+            </div>
+        </div>
+    )
+}
+
+export default Auth
+```
+
+Pendant que nous sommes dans le dossier pages, supprimez également la ligne initFirebase de `index.js`.
+
+### Logique d'authentification
+
+Il ne reste plus qu'à gérer la logique. Créez 4 fichiers dans votre dossier Firebases.
+
+- mapUserData.js
+- useUser.js
+- userCookies.js
+
+#### Cookies
+
+Collez le code suivant dans `userCookies.js`. Ceci est tiré de la documentation next.js.
+
+```javascript:userCookies.js
+import cookies from 'js-cookie'
+
+export const getUserFromCookie = () => {
+    const cookie = cookies.get('auth')
+    if (!cookie) {
+        return
+    }
+    return JSON.parse(cookie)
+}
+
+export const setUserCookie = (user) => {
+    cookies.set('auth', user, {
+        // firebase id tokens expire in one hour
+        // set cookie expiry to match
+        expires: 1 / 24,
+    })
+}
+
+export const removeUserCookie = () => cookies.remove('auth')
+```
+
+This code sets cookies so the user can close the website and reopen it and not have to log back in. Make sure to add `js-cookie` via yarn or npm.
+
+#### User Data
+
+Next, inside of map user data, add the following:
+
+```javascript:mapUserData.js
+export const mapUserData = (user) => {
+    const { uid, email, xa, displayName, photoUrl } = user
+    return {
+        id: uid,
+        email,
+        token: xa,
+        name: displayName,
+        profilePic: photoUrl
+    }
+}
+```
+
+Ceci est encore une fois tiré du site Web Next.js. Le code mappe les données que nous obtenons sur les variables personnalisées.
+
+#### Personnalisation du USer Hook
+
+Enfin, modifions le fichier `useUser`. Ce fichier a les tâches suivantes :
+
+- créez une méthode de déconnexion.
+- nous donner un crochet pour amener l'utilisateur connecté n'importe où dans notre application.
+- fournir un écouteur d'authentification
+
+Voici le code :
+
+```javascript:useUser.js
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import initFirebase from '../firebase/initFirebase'
+import {
+    removeUserCookie,
+    setUserCookie,
+    getUserFromCookie,
+} from './userCookies'
+import { mapUserData } from './mapUserData'
+
+initFirebase()
+
+const useUser = () => {
+    const [user, setUser] = useState()
+    const router = useRouter()
+
+    const logout = async () => {
+        return firebase
+            .auth()
+            .signOut()
+            .then(() => {
+                // Sign-out successful.
+                router.push('/auth')
+            })
+            .catch((e) => {
+                console.error(e)
+            })
+    }
+
+    useEffect(() => {
+        // Firebase updates the id token every hour, this
+        // makes sure the react state and the cookie are
+        // both kept up to date
+        const cancelAuthListener = firebase.auth().onIdTokenChanged((user) => {
+            if (user) {
+                const userData = mapUserData(user)
+                setUserCookie(userData)
+                setUser(userData)
+            } else {
+                removeUserCookie()
+                setUser()
+            }
+        })
+
+        const userFromCookie = getUserFromCookie()
+        if (!userFromCookie) {
+            router.push('/')
+            return
+        }
+        setUser(userFromCookie)
+
+        return () => {
+            cancelAuthListener()
+        }
+    }, [])
+
+    return { user, logout }
+}
+
+export { useUser }
+```
+
+L'authentification devrait maintenant fonctionner. Essayez de vous connecter avec votre e-mail et votre mot de passe. Notez que si vous souhaitez utiliser l'un des OAuth
+fournisseurs, vous devrez les activer dans votre page de paramètres d'authentification Firebase.
+
+Maintenant que nous avons l'authentification, nous souhaitons afficher dynamiquement une page d'index personnalisée selon que l'utilisateur est connecté ou non.
+Apportez les modifications suivantes au fichier `index.js`.
+
+```javascript:index.js
+import Head from 'next/head'
+import styles from '../styles/Home.module.css'
+import WriteToCloudFirestore from '../components/cloudFirestore/Write'
+import ReadDataFromCloudFirestore from '../components/cloudFirestore/Read'
+import { useUser } from '../firebase/useUser'
+
+export default function Home() {
+  const { user, logout } = useUser()
+
+  if (user) {
+    return (
+      <div>
+        <h1>{user.name}</h1>
+        <h3>{user.email}</h3>
+        {user.profilePic ? <image src={user.profilePic} height={50} width={50}></image> : <p>No profile pic</p>}
+        <WriteToCloudFirestore />
+        <ReadDataFromCloudFirestore />
+        <button onClick={() => logout()}>Log Out</button>
+      </div>
+    )
+  }
+
+  else return (
+    <div className={styles.container}>
+      <p><a href="/auth">Log In!</a></p>
+
+      <Head>
+        <title>Create Next App</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
+      <main className={styles.main}>
+        <h1 className={styles.title}>
+          Welcome to <a href="https://nextjs.org">Next.js!</a>
+        </h1>
+
+ // Le reste ne change pas
+```
+
+### Mise à jour en lecture/écriture
+
+Enfin, modifions le nom du document lorsque nous envoyons des données via Cloud Firestore. De cette façon, chaque utilisateur voit ses données stockées
+dans une clé unique.
+
+Dans le dossier `cloudFirestore`:
+
+```javascript:Read.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import { useUser } from '../../firebase/useUser'
+
+const ReadDataFromCloudFirestore = () => {
+    const { user } = useUser()
+    const readData = () => {
+        try {
+            firebase
+                .firestore()
+                .collection('myCollection')
+                .doc(user.id)
+                .onSnapshot(function (doc) {
+                    console.log(doc.data())
+                })
+            alert('Data was successfully fetched from cloud firestore! Close this alert and check console for output.')
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
+    }
+
+    return (
+        <button onClick={readData}>Read Data From Cloud Firestore</button>
+    )
+}
+
+export default ReadDataFromCloudFirestore
+```
+
+```javascript:Write.js
+import firebase from 'firebase/app'
+import 'firebase/firestore'
+import { useUser } from '../../firebase/useUser'
+
+const WriteToCloudFirestore = () => {
+    const { user } = useUser()
+    const sendData = () => {
+        try {
+            firebase
+                .firestore()
+                .collection('myCollection')
+                .doc(user.id) // leave as .doc() for a random unique doc name to be assigned
+                .set({
+                    string_data: 'Benjamin Carlson',
+                    number_data: 2,
+                    boolean_data: true,
+                    map_data: { stringInMap: 'Hi', numberInMap: 7 },
+                    array_data: ['text', 4],
+                    null_data: null,
+                    time_stamp: firebase.firestore.Timestamp.fromDate(new Date('December 17, 1995 03:24:00')),
+                    geo_point: new firebase.firestore.GeoPoint(34.714322, -131.468435)
+                })
+                .then(alert('Data was successfully sent to cloud firestore!'))
+        } catch (error) {
+            console.log(error)
+            alert(error)
+        }
+    }
+
+    return (
+        <button onClick={sendData}>Envoyer des données vers Cloud Firestore</button>
+    )
+}
+
+export default WriteToCloudFirestore
+```
+
+C'est tout pour l'authentification Firebase !
+
+## Base de données en temps réel
+
+Ensuite, nous ajouterons une base de données en temps réel. Nous allons construire un bouton simple où lorsque vous appuyez sur est, cela incrémente un décompte. Ce
+Le nombre est stocké dans la base de données et est unique à chaque utilisateur. Le décompte sera ensuite récupéré et affiché à l'utilisateur.
+
+Tout d'abord, créez un composant nommé « Counter.js » dans le dossier «components/realtimeDatabase». Créez un composant de base.
+
+```javascript:Counter.js
+import { useState, useEffect } from 'react'
+import firebase from 'firebase/app'
+import 'firebase/database'
+
+const Counter = ({ id }) => {
+    return (
+        <button onClick={increaseCount}>Increase count {count ? count : '–––'}</button>
+    )
+}
+
+export default Counter
+```
+
+Comme vous pouvez le voir, le bouton s'appelle une méthode nommée `increaseCount`. Créons ceci. Pour ce faire, nous utiliserons la syntax firebase.database().ref().child().off().
+
+```javascript:Counter.js
+import { useState, useEffect } from 'react'
+import firebase from 'firebase/app'
+import 'firebase/database'
+
+const Counter = ({ id }) => {
+    const [count, setCount] = useState('')
+    useEffect(() => {
+        const onCountIncrease = (count) => setCount(count.val())
+
+        const fetchData = async () => {
+            firebase.database().ref('counts').child(id).on('value', onCountIncrease)
+        }
+
+        fetchData()
+
+        return () => {
+            firebase.database().ref('counts').child(id).off('value', onCountIncrease)
+        }
+    }, [id])
+
+    const increaseCount = async () => {
+        const registerCount = () => fetch(`/api/incrementCount?id=${encodeURIComponent(id)}`)
+        registerCount()
+    }
+
+    return (
+        <button onClick={increaseCount}>Increase count {count ? count : '–––'}</button>
+    )
+}
+
+export default Counter
+```
+
+Nous devons créer la route API pour cela.
+
+Créez un fichier nommé `fetchCount.js` dans `pages/api`.
+
+À l’intérieur, nous pouvons récupérer le décompte.
+
+```javascript:fetchCount.js
+import firebase from 'firebase/app'
+import 'firebase/database'
+
+export default (req, res) => {
+    const ref = firebase.database().ref('counts').child(req.query.id)
+
+    return ref.once('value', (snapshot) => {
+        res.status(200).json({
+            total: snapshot.val()
+        })
+    })
+}
+```
+
+Maintenant, importons le composant dans `index.js` et utilisons-le ! N'oubliez pas de transmettre un identifiant unique ; J'utiliserai l'uid utilisateur de `useUser`.
+
+```javascript:index.js
+import Counter from '../components/realtimeDatabase/Counter'
+// Autres importations
+
+// Autre code
+<ReadDataFromCloudFirestore />
+<Counter id={user.id} />  // added line
+<button onClick={() => logout()}>Log Out</button>
+// La suite du code ici
+```
+
+## Storage
+
+Pour le stockage, nous n'avons besoin de créer qu'un seul fichier. Dans le dossier de vos composants, créez un dossier nommé `storage` puis
+créez un fichier nommé `uploadFile.js`. Créez d’abord un composant avec une entrée HTML et une progression.
+
+```javascript:uploadFile.js
+import { useRef, useState } from 'react'
+import firebase from 'firebase/app'
+import 'firebase/storage'
+
+const UploadFile = () => {
+    const inputEl = useRef(null)
+    const [value, setValue] = useState(0)
+    return (
+        <>
+            <progress value={value} max="100"></progress>
+            <input
+                type="file"
+                onChange={uploadFile}
+                ref={inputEl}
+            />
+        </>
+    )
+}
+```
+
+Comme vous pouvez le voir, nous utilisons useState et useRef pour gérer l'indicateur de progression et le téléchargement du fichier. Pour télécharger le
+fichier, nous devons récupérer le fichier et utiliser `.put` pour l'envoyer à Firebase.
+
+```javascript:uploadFile.js
+function uploadFile() {
+        // get file
+        var file = inputEl.current.files[0]
+
+        // create a storage ref
+        var storageRef = firebase.storage().ref('user_uploads/' + file.name)
+
+        // upload file
+        var task = storageRef.put(file)
+
+        // update progress bar
+        task.on('state_change',
+
+            function progress(snapshot) {
+                setValue((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            },
+
+            function error(err) {
+                alert(error)
+            },
+
+            function compleete() {
+                alert('Téléchargé sur le stockage Firebase avec succès !')
+            }
+        )
+    }
+```
+
+Enfin, importez ce composant dans `index.js`!
+
+```javascript:index.js
+import ReadDataFromCloudFirestore from '../components/cloudFirestore/Read'
+import { useUser } from '../firebase/useUser'
+import Counter from '../components/realtimeDatabase/Counter'
+import UploadFile from '../components/storage/UploadFile' // added line
+
+export default function Home() {
+  const { user, logout } = useUser()
+
+  if (user) {
+    return (
+      <div>
+      <div className={styles.container}>
+        <h1>{user.name}</h1>
+        <h3>{user.email}</h3>
+        {user.profilePic ? <image src={user.profilePic} height={50} width={50}></image> : <p>No profile pic</p>}
+        <WriteToCloudFirestore />
+        <ReadDataFromCloudFirestore />
+        <Counter id={user.id} />
+        <UploadFile /> // added line
+        <button onClick={() => logout()}>Log Out</button>
+      </div>
+      // other code
+    )
+```
+
+## Conclusion
+
+Avec cela, nous avons ajouté avec succès Firebase à notre site Web Next.js.

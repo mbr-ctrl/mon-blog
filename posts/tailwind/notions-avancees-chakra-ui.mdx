@@ -1,0 +1,148 @@
+---
+title: "Notions avancées Chakra UI"
+description: "Apprenez 5 astuces avancées de Chakra UI pour passer du statut de développeur React débutant à avancé."
+author: "Mubarak Mohamed"
+date: 2024-01-25
+tags: ["chakra-ui", "react"]
+thumbnail: "firebase.png"
+---
+
+## Introduction
+
+[Chakra UI](https://chakra-ui.com) est un framework CSS pour les applications basées sur React. Il est très facile à utiliser, ce qui permet une expérience de développement fluide. J'utilise Chakra UI depuis plus d'un an maintenant et pendant cette période, j'ai beaucoup appris à ce sujet. Dans cet article, je vais vous montrer 5 fonctionnalités de Chakra UI qui vous feront passer du niveau débutant à avancé.
+
+<Step number="1" title="Custom Theme Multiple Files" />
+
+Lorsque vous remplacez le thème par défaut, la plupart des développeurs créent un fichier de thème, généralement nommé « theme.js ». Lorsque votre projet s'agrandit et que vous disposez de plusieurs composants et de plusieurs remplacements, ce fichier deviendra long et difficile à lire. Pour résoudre ce problème, nous pouvons utiliser plusieurs fichiers de thème. Cela ressemblera à ceci : Nous pouvons créer un dossier nommé « thème ». À l'intérieur d'ici, créez un fichier nommé « index.js ». Ce sera le point d’entrée principal de notre thème. C'est là que nous utiliserons le hook `extendTheme` et passerons les remplacements.
+
+```jsx
+📁 theme
+  📄 index.js  # my main theme entrypoint
+  📄 styles.js  # all my global style overrides
+  📁 foundations
+    📄 borders.js  # all my border overrides
+  📁 components
+    📄 button.js  # all my button overrides
+```
+
+Vous remarquerez que nous importons quelques autres fichiers. `styles.js` seront tous nos remplacements de styles personnalisés. Par exemple, la couleur, les polices, etc. Le dossier « foundations » contiendra nos remplacements de style fondamental et le dossier « components » contiendra tous nos remplacements de style de composant. En le divisant ainsi, nous créons un projet convivial et évolutif.
+
+```jsx
+// theme/index.js
+import { extendTheme } from "@chakra-ui/react";
+
+// Global style overrides
+import styles from "./styles";
+
+// Foundational style overrides
+import borders from "./foundations/borders";
+
+// Component style overrides
+import Button from "./components/button";
+
+const overrides = {
+  styles,
+  borders,
+  // Other foundational style overrides go here
+  components: {
+    Button,
+    // Other components go here
+  },
+};
+
+export default extendTheme(overrides);
+```
+
+<Step number="2" title="useBreakpointValue" />
+
+Normalement, pour créer des valeurs réactives dans Chakra UI, vous faites quelque chose comme ceci :
+
+```jsx
+<Text fontSize={[10, 20, 30]}>Je suis responsive.</Text>
+
+// or
+
+<Text fontSize={{ base: "24px", md: "40px", lg: "56px" }}>Je suis responsive.</Text>
+```
+
+Cependant, certaines propriétés comme la variante et la taille ne l'acceptent pas. Pour ces propriétés, nous devons utiliser le hook `useBreakpointValue`. En utilisant cela, nous pouvons obtenir le même effet que la syntaxe des tableaux et des objets.
+
+```jsx
+function Example() {
+  const variant = useBreakpointValue({ base: "outline", md: "solid" });
+
+  return (
+    <VStack align="flex-start">
+      <Text>Resize your window to see the button variant change</Text>
+      <Button colorScheme="teal" variant={variant}>
+        Button
+      </Button>
+    </VStack>
+  );
+}
+```
+
+<Step number="3" title="useMediaQuery" />
+
+`mediaQuery` est une fonctionnalité CSS avancée mais Chakra UI la rend plus facile à utiliser. Vous vous demandez peut-être pourquoi en avons-nous besoin si nous avons déjà des points d'arrêt personnalisés ? Eh bien, vous souhaiterez peut-être ajouter un point d'arrêt qui n'est pas défini dans nos points d'arrêt personnalisés à un seul élément. Pour l'utiliser, utilisez simplement le hook `useMediaQuery` et transmettez votre valeur. Utilisez ensuite la variable dans le code !
+
+```jsx
+function Example() {
+  const [isLargerThan1280] = useMediaQuery("(min-width: 1280px)");
+
+  return (
+    <Text>
+      {isLargerThan1280 ? "larger than 1280px" : "smaller than 1280px"}
+    </Text>
+  );
+}
+```
+
+<Step number="4" title="config" />
+
+Il existe une propriété appelée « config » qui est transmise au hook « extendTheme ». Cette propriété comprend 3 propriétés de configuration de thème globales que la plupart des gens n'utilisent pas.
+
+```jsx
+const config = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+  cssVarPrefix: "coffeeclass-io",
+};
+```
+
+Le premier est « initialColorMode ». Il s'agit du mode de couleur initial qui s'affichera lorsque l'utilisateur accèdera à votre site.
+
+Le second est « useSystemColorMode ». Il s'agit d'une valeur booléenne qui indique à Chakra UI d'utiliser le mode de couleur du système (ou non s'il est défini sur « false »).
+
+Le troisième est « cssVarPrefix ». C'est le préfixe que Chakra UI utilisera pour toutes ses variables CSS. Cela ne change aucun comportement, mais c'est un moyen intéressant de personnaliser davantage votre application.
+
+<Step number="5" title="Custom Color Palette" />
+
+Dès la sortie de la boîte, Chakra UI nous fournit de jolies couleurs. Si vous approfondissez les couleurs, vous remarquerez que chaque couleur a une valeur comprise entre [50 et 900](https://chakra-ui.com/docs/theming/theme). C'est pour cela que cela fonctionne bien avec la propriété `colorScheme` et le mode couleur. Vous pouvez créer votre propre palette de couleurs personnalisée, telle qu'une palette de couleurs de marque, mais en la nommant puis en transmettant des valeurs hexadécimales pour chacune des valeurs. Vous voudrez faire de 50 votre couleur la plus claire et travailler plus foncé pour de meilleurs résultats.
+
+```jsx
+custom_brand: {
+        50: '#FFF29F',
+        100: '#FFEE80',
+        200: '#FFEA60',
+        300: '#FFE540',
+        400: '#FFE120',
+        500: '#FFDD00',
+        600: '#DFC100',
+        700: '#BFA600',
+        800: '#9F8A00',
+        900: '#806E00'
+    }
+```
+
+```jsx
+<Button colorScheme="custom_brand" size="xs">
+  Button
+</Button>
+```
+
+![Chakra UI default red color pallete](/content/articles/advanced-chakra-ui-do-you-know-all-5/color-pallete.png)
+
+## Conclusion
+
+Connaissez-vous ces 5 astuces avancées de l'interface utilisateur Chakra ? Si c'est le cas, laissez un commentaire ci-dessous !
