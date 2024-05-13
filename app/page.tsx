@@ -6,7 +6,7 @@ import Footer from "./_components/Footer";
 import Banner from "./_components/Banner";
 import Categories from "./_components/Categories";
 
-export default function Home({ allPosts }: { allPosts: PostMeta[] }) {
+export default function Home() {
   const posts = getSortedPostsData("react");
   return (
     <main className="min-h-screen text--colors_default bg--default container mx-auto">
