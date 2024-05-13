@@ -4,6 +4,7 @@ export type PostMeta = {
   description: string;
   date: Date;
   tags: string[];
+  author: string;
   thumbnail: string;
 };
 

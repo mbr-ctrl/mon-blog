@@ -2,19 +2,27 @@ import NavBar from "@/app/_components/NavBar";
 import { MDXComponent } from "@/lib/mdxComponents/MDXComponents";
 import { getPostBySlug, getPostsSlug } from "@/lib/post";
 import React from "react";
+import { Metadata } from "next";
 import { FaCalendarCheck } from "react-icons/fa6";
-import { Helmet } from "react-helmet";
 import Author from "@/app/_components/Author";
 import Footer from "@/app/_components/Footer";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug, "tailswindcss");
+  return {
+    title: post.frontmatter.title,
+    description: post.frontmatter.description,
+    keywords: post.frontmatter.tags.join(", "),
+  };
+}
+
 export default async function page({ params }: { params: { slug: string } }) {
   const post = await getPostBySlug(params.slug, "tailwindcss");
-  const seoMeta = {
-    title: post.frontmatter.title, // Set page title
-    description: post.frontmatter.description || "",
-    keywords: post.frontmatter.tags.join(", "), // Create comma-separated keywords from tags
-    // Optionally add other relevant metadata (e.g., author, image)
-  };
+
   return (
     <div className="min-h-screen container mx-auto">
       <NavBar />
@@ -34,7 +42,7 @@ export default async function page({ params }: { params: { slug: string } }) {
           ))}
         </div>
 
-        <article className="prose max-w-none mt-4 p-2 text-justify">
+        <article className="prose prose-code:w-96 max-w-none mt-4 p-2 text-justify">
           <MDXComponent code={post.code} />
         </article>
       </div>

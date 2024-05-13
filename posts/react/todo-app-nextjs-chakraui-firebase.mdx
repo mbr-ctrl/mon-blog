@@ -66,19 +66,19 @@ NEXT_PUBLIC_COOKIE_SECURE=false # set to true in HTTPS environment
 
 Next, create a Firebase project and create a web project inside of it.
 
-![Image de la création d'une application Web Firebase](/images/todo-app-nextjs/create-web-app.png)
+![Image de la création d'une application Web Firebase](../images/todo-app-nextjs/create-web-app.png)
 
 Allez-y et activez l'authentification par e-mail/mot de passe, le cloud Firestore et la base de données en temps réel.
 
-![Image of left sidebar](/images/todo-app-nextjs/left-sidebar.png)
+![Image of left sidebar](../images/todo-app-nextjs/left-sidebar.png)
 
 Maintenant, allez dans les paramètres du projet. Dans l'onglet général, vous retrouverez la plupart de vos valeurs secrètes.
 
-![Image of secrets](/images/todo-app-nextjs/secrets.png)
+![Image of secrets](../images/todo-app-nextjs/secrets.png)
 
 Pour obtenir les valeurs restantes, cliquez sur l'onglet "Comptes de service" et "Générer une nouvelle clé privée". Ouvrez le fichier téléchargé. Les valeurs secrètes restantes telles que la clé API (la chaîne super longue) peuvent être trouvées ici.
 
-![Image of generating a private key](/content/articles/todo-app-nextjs-chakraui-firebase/generate-private-key.png)
+![Image of generating a private key](../images/todo-app-nextjs/generate-private-key.png)
 
 > Pour les 2 secrets des cookies, générez simplement 2 chaînes aléatoires !
 
@@ -334,4 +334,4 @@ const deleteTodo = (t) => {
 
 ## Conclusion
 
-We have now created a todo web app with Firebase Auth, Next.js as the JS framework, Chakra UI as the CSS framework, Firebase Cloud Firestore as the backend, and React Hooks to handle data locally. If you want to look at any of these in more detail, check out the recommended posts below!
+Nous avons maintenant créé une application Web Todo avec Firebase Auth, Next.js comme framework JS, Chakra UI comme framework CSS, Firebase Cloud Firestore comme backend et React Hooks pour gérer les données localement.
