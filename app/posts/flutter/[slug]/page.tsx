@@ -51,12 +51,3 @@ export default async function page({ params }: { params: { slug: string } }) {
     </div>
   );
 }
-
-export async function getStaticPaths() {
-  const slugs = getPostsSlug("flutter");
-
-  return {
-    paths: slugs, // Use the paths variable defined above
-    fallback: false, // Consider 'blocking' or 'server' for dynamic data
-  };
-}
