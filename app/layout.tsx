@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import GoogleAnalytics from "./_components/GoogleAnalytics";
 import { ThemeProvider } from "./_components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,6 +24,7 @@ export default function RootLayout({
     <>
       <html lang="en" suppressHydrationWarning>
         <head />
+        <GoogleAnalytics />
         <body className="container mx-auto-screen">
           <ThemeProvider
             attribute="class"
