@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="footer footer-center p-10 bg-base-200 text-base-content rounded flex flex-col justify-center items-center gap-8 bottom-0">
       <nav className="flex justify-center gap-8">
-        <a className="link link-hover">A propos de moi</a>
+        <a className="link link-hover">A propos</a>
         <a className="link link-hover">Jobs</a>
         <a className="link link-hover">Press kit</a>
       </nav>

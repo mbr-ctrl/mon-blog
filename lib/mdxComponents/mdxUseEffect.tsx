@@ -13,22 +13,10 @@ const Step = ({ number, title }: StepProps) => {
   }
 
   return (
-    <Flex align="center" mt={12} mb={1}>
-      <Flex
-        borderRadius="50%"
-        border="1px solid"
-        w={35}
-        h={35}
-        alignItems="center"
-        justifyContent="center"
-        mr={2}
-      >
-        {number}
-      </Flex>
-      <Heading as="h2" size="md" id={title}>
-        {title}
-      </Heading>
-    </Flex>
+    <div className="flex gap-2 items-center justify-start">
+      <div className="flex justify-center items-center text-xl">{number}</div>
+      <h2 className="text-md"> {title} </h2>
+    </div>
   );
 };
 
